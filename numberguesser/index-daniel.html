@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.css" integrity="sha512-5fsy+3xG8N/1PV5MIJz9ZsWpkltijBI48gBzQ/Z2eVATePGHOkMIn+xTDHIfTZFVb9GMpflF2wOWItqxAP2oLQ==" crossorigin="anonymous" />  
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="two-thirds column">
+        <h1>Number Guesser</h1>
+        <p> Guess a number between 1 and 10.</p>
+        <form id="guessForm">
+          <input type="number" id="guess" placeholder="Enter your guess" min=1 max=10 required>
+          <input class="button-primary" id="submit" type="submit" value="Guess!">
+        </form>
+        <p id="message" style="display:none">Waiting for a guess.</p>
+      </div>
+    </div>
+  </div>
+  <script src="app-daniel.js"></script>
+</body>
+</html>
