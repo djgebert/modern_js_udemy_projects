@@ -6,9 +6,16 @@ searchInputElem.addEventListener("keyup", handleSearchInputChange);
 function handleSearchInputChange(e) {
   const searchText = searchInputElem.value;
   if(searchText != '') {
-    GitHubAccess.getProfileWithAjaxAndCallback(searchText, GitHubAccess.handleProfileAjaxResult);
+    
+    // With fetch and promises
+    GitHubAccess.getProfileWithFetchAndPromises(searchText);
+    
+    // With Ajax
+    // GitHubAccess.getProfileWithAjaxAndCallback(searchText, GitHubAccess.handleProfileAjaxResult);
   }
-
+  else{
+    UI.clearProfileAndRepos();
+  }
   e.preventDefault();
 }
 
@@ -53,12 +60,21 @@ class GitHubAccess {
       UI.displayError("Could not find repos.");
     }
   }
-}
 
+  static getProfileWithFetchAndPromises(username) {
+    const fetchPromise = fetch(this.profileUrl(username))
+    console.log(fetchPromise);
+  }
+}
 
 class UI {
   static displayError(message) {
-    this.clearProfileAndRepos();
+    profileDivElem.innerHTML = `
+    <div class="alert alert-danger">
+      Username not found.
+    </div>`
+
+    setTimeout(this.clearProfileAndRepos, 3000);
   }
 
   static displayProfile(dataJSON) {
