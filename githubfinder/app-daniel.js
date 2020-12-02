@@ -7,8 +7,11 @@ function handleSearchInputChange(e) {
   const searchText = searchInputElem.value;
   if(searchText != '') {
     
+    // With fetch and async/await
+    GitHubAccess.getProfileWithFetchAndAsync(searchText);
+
     // With fetch and promises
-    GitHubAccess.getProfileWithFetchAndPromises(searchText);
+    // GitHubAccess.getProfileWithFetchAndPromises(searchText);
     
     // With Ajax
     // GitHubAccess.getProfileWithAjaxAndCallback(searchText, GitHubAccess.handleProfileAjaxResult);
@@ -62,19 +65,55 @@ class GitHubAccess {
   }
 
   static getProfileWithFetchAndPromises(username) {
-    const fetchPromise = fetch(this.profileUrl(username))
-    console.log(fetchPromise);
+    fetch(this.profileUrl(username))
+      .then(function(response){
+        if(response.status === 404){
+         thow(Error("User not found."));
+        }
+        return response.json();
+      })
+      .then(function(profile){
+        UI.displayProfile(JSON.stringify(profile));
+        return fetch(GitHubAccess.reposUrl(username));
+      })
+      .then(function(response){
+        return response.json();
+      })
+      .then(function(repos){
+       UI.displayRepos(JSON.stringify(repos));
+      })
+      .catch(function(error){
+        UI.displayError(error);
+      })
+  }
+
+  static async getProfileWithFetchAndAsync(username) {
+    try{
+      const profileResponse = await fetch (this.profileUrl(username));
+      if(profileResponse.status !== 200){
+        throw(new Error("User not found."));
+      }
+      const jsonProfile = await profileResponse.text();
+      UI.displayProfile(jsonProfile);
+      const reposResponse = await fetch(this.reposUrl(username));
+      const jsonRepos = await reposResponse.text();
+      UI.displayRepos(jsonRepos);
+    }
+    catch(error){
+      UI.displayError(error);
+    }
   }
 }
 
 class UI {
   static displayError(message) {
+    this.clearProfileAndRepos();
     profileDivElem.innerHTML = `
-    <div class="alert alert-danger">
+    <div id="error" class="alert alert-danger">
       Username not found.
     </div>`
 
-    setTimeout(this.clearProfileAndRepos, 3000);
+    setTimeout(this.clearError, 3000);
   }
 
   static displayProfile(dataJSON) {
@@ -134,6 +173,15 @@ class UI {
 
   static clearProfileAndRepos() {
     profileDivElem.innerHTML = "";
+  }
+
+  static clearError() {
+    try{
+      document.getElementById("error").remove();
+    }
+    catch{
+      // error element already removed, so ignore error
+    }
   }
 
 }
