@@ -12,6 +12,8 @@ const bookListElement = document.getElementById("book-list");
 
 // Listeners
 bookForm.addEventListener("submit", addABook);
+bookListElement.addEventListener('click', handleDeleteClick);
+
 
 /**
  * The global booklist.
@@ -31,18 +33,9 @@ function Book(title, author, isbn){
     throw(new Error("Please provide all fields."));
   }
   
-  this.title, this.author, this.isbn = title, author, isbn;
-
-  /**
-   * @returns {string} The book's title
-   */
-  Book.prototype.title = () => title;
-
-  /** @returns {string} The book's author */
-  Book.prototype.author = () => author;
-
-  /** @returns {number} The book's ISBN */
-  Book.prototype.isbnValue = () => isbn;
+  this.title = title;
+  this.author = author;
+  this.isbn = isbn;
 }
 
 
@@ -52,9 +45,30 @@ function Book(title, author, isbn){
 
 // Load list of books to local storage
 
+/**
+ * Handle a click on a delete icon
+ * @param {Event} event 
+ */
+function handleDeleteClick(event){
+  if(event.target.classList.contains('fa-trash')){
+    /** @type {HTMLTableRowElement} */
+    const rowElementToDelete = event.target.parentElement.parentElement;
+    deleteABook(rowElementToDelete.id);
+  }
+}
+
 
 // Delete an existing book from the list
-
+function deleteABook(isbn){
+  
+  try{
+    bookList.splice(bookList.findIndex(book => book.isbn === isbn), 1);
+  }
+  catch(error){
+    displayError(error);
+  }
+  displayBooks();
+}
 
 // Add a book to the list
 /**
@@ -63,13 +77,13 @@ function Book(title, author, isbn){
  */
 function addABook(event){
   try{
-    const existingISBNs = bookList.map(book => book.isbnValue());
+    const existingISBNs = bookList.map(book => book.isbn);
     if(existingISBNs.includes(isbnInput.value)){
       throw(new Error("ISBN already exists."));
     }
     const newBook = new Book(titleInput.value, authorInput.value, isbnInput.value);
     bookList.push(newBook);
-    console.log(`Added ${newBook.title()} by ${newBook.author()}.`);
+    console.log(`Added ${newBook.title} by ${newBook.author}.`);
   }
   catch(error){
     displayError(error);
@@ -81,14 +95,15 @@ function addABook(event){
 
 // Display full book list
 function displayBooks(){
+  bookListElement.innerHTML = "";
   bookList.forEach(function(book){
     /** @type {HTMLTableRowElement} */  
     const newRowElement = document.createElement("tr");
-    newRowElement.setAttribute("id", book.isbnValue());
+    newRowElement.setAttribute("id", book.isbn);
     newRowElement.innerHTML = `
-    <td>${book.title()}</td>
-    <td>${book.author()}</td>
-    <td>${book.isbnValue()}</td>
+    <td>${book.title}</td>
+    <td>${book.author}</td>
+    <td>${book.isbn}</td>
     <td><i class="fa fa-trash"></i></td>
     `
     bookListElement.appendChild(newRowElement);
