@@ -34,31 +34,29 @@ let bookList = [];
 
 /**
  * Represents a book
- * @constructor
- * @param {string} title - The title of the book
- * @param {string} author - The author of the book
- * @param {number} isbn - The unique ISBN of the book
- */ 
-function Book(title, author, isbn){
-  if(!(title && author && isbn)){
-    throw(new Error("Please provide all fields."));
-  }
-  
-  this.title = title;
-  this.author = author;
-  this.isbn = isbn;
-}
-
-/**
- * @constructor
- * @param {string} message 
  */
-function ISBNError(message){
-  Error.call(this, message);
+class Book{
+  /**
+   * Create a new book
+   * @param {string} title 
+   * @param {string} author 
+   * @param {number} isbn 
+   */
+  constructor(title, author, isbn){
+    if(!(title && author && isbn)){
+      throw new Error("Please provide all fields!");
+    }
+    this.title = title;
+    this.author = author;
+    this.isbn = isbn;
+  }
 }
 
-ISBNError.prototype = Object.create(Error.prototype);
-ISBNError.prototype.constructor = ISBNError;
+class ISBNError extends Error{
+  constructor(message){
+    super(message);
+  }
+}
 
 // Write list of books to local storage
 function writeBookListToStorage(){
@@ -115,14 +113,12 @@ function addABook(event){
     clearInputs();
   }
   catch(error){
-    console.log(error);
+    displayError(error);
     if(error instanceof ISBNError){
-      displayError("ISBN already exists");
-      isbnInput.focus();
+      isbnInput.focus()
       isbnInput.select();
     }
     else{
-      displayError(error);
       titleInput.focus();
     }
   }
